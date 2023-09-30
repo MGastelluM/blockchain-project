@@ -9,7 +9,7 @@ export async function sendBlockToServer(block:Block) {
   try {
     const dataToSend = {
       key: block.hash, // Usar el hash del bloque como clave única
-      data: block.transaction,
+      data: block.index,
     };
 
     const response = await fetch('http://localhost:3000/storeData', {

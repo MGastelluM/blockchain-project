@@ -2,67 +2,62 @@ import * as crypto from "crypto";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
 
+require('dotenv').config()
+const par:any = process.env.DIFFICULTY
+const DIFFICULTY:number =parseInt(par)
+
 export class Chain {
-  // Singleton instance as we only want 1 chain
   public static instance = new Chain();
-
-  // The chain is a series of linked blocks
   chain: Block[];
-
-  // Create genesis block
   constructor() {
-    this.chain = [new Block("", new Transaction(100, "genesis", "godwin"))];
+    this.chain = [new Block(42,"", new Transaction(100, "genesis", "Satoshi"))];
   }
 
-  // Return the last block in the chain
   get lastBlock() {
     return this.chain[this.chain.length - 1];
   }
 
-  // Mine a block to confirm it as a transaction on the blockchain
-  mine(numOnlyUsedOnce: number) {
-    let solution = 1;
-    console.log("🐢 Mining transaction...");
-
-    // Keep looping until solution is found
-    while (true) {
-      const hash = crypto.createHash("MD5");
-      hash.update((numOnlyUsedOnce + solution).toString()).end();
-
-      const attempt = hash.digest("hex");
-
-      // Add more 0's to make it harder
-      if (attempt.substr(0, 4) === "0000") {
-        console.log(
-          `---> Solved transaction with solution: ${solution}. Block is confirmed!\n`
-        );
-        return solution;
+  getBlock(indexOrHash: number | string): Block | null {
+    if (typeof indexOrHash === "number") {
+      if (indexOrHash >= 0 && indexOrHash < this.chain.length) {
+        return this.chain[indexOrHash];
       }
-
-      solution += 1;
+    } else if (typeof indexOrHash === "string") {
+      for (const block of this.chain) {
+        if (block.hash === indexOrHash) {
+          return block;
+        }
+      }
     }
+    return null;
   }
+  
+addBlock(
+  transaction: Transaction,
+  senderPublicKey: string,
+  signature: Buffer
+) {
+  console.log("From<Chain> : 💰  New transaction! - awaiting verification...");
+  const verifier = crypto.createVerify("SHA256");
+  verifier.update(transaction.toString());
 
-  // Add a block to the blockchain
-  addBlock(
-    transaction: Transaction,
-    senderPublicKey: string,
-    signature: Buffer
-  ) {
-    console.log("🐢 Sending TurtleCoin...");
+  const isValid = verifier.verify(senderPublicKey, signature);
 
-    // Verify a transaction before adding it
-    const verifier = crypto.createVerify("SHA256");
-    verifier.update(transaction.toString());
-
-    const isValid = verifier.verify(senderPublicKey, signature);
-
-    // If it is valid, create a block, mine it and add it to the blockchain
-    if (isValid) {
-      console.log("🐢 Transaction is valid!");
-      const newBlock = new Block(this.lastBlock.hash, transaction);
-      this.mine(newBlock.numberOnlyUsedOnce);
+  if (isValid) {
+    console.log("From<Chain>: 🧾 Sender transaction valid!");
+    const newBlock = new Block(this.chain.length+1,
+      this.lastBlock.hash, 
+      transaction,         
+      Date.now()        
+    );
+  
+    
+    if(newBlock.mine(DIFFICULTY))
+    {
       this.chain.push(newBlock);
+      console.log("From<Chain>: 🧾 newBlockPushedToChain succesfully!");
     }
   }
+}
+
 }
