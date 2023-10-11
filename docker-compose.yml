@@ -1,0 +1,15 @@
+version: '3'
+services:
+  blockchain:
+    build:
+      context: ./blockchain-project
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
+  db-level:
+    build:
+      context: ./db-level
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
