@@ -2,9 +2,11 @@
   "name": "blockchain-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "exports": "./start.js",
+  "type": "module",
   "scripts": {
     "start": "ts-node index.ts",
+    "p2p": "ts-node libptest.ts",
     "build:watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
