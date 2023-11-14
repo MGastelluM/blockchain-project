@@ -19,11 +19,16 @@
   },
   "homepage": "https://github.com/MGastelluM/blockchain-project#readme",
   "dependencies": {
+    "@chainsafe/libp2p-noise": "^13.0.3",
+    "@libp2p/mplex": "^9.0.12",
+    "@libp2p/tcp": "^8.0.13",
     "@types/node": "^20.7.0",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "esm-hook": "^0.1.4",
     "level": "^8.0.0",
+    "libp2p": "^0.46.21",
+    "multiaddr": "^10.0.1",
     "node-fetch": "^3.3.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
