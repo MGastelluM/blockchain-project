@@ -2,8 +2,7 @@ import { Block } from "./functions/src/blockchain-core/block";
 import { Chain } from "./functions/src/blockchain-core/chain";
 import { getGenesisBlock, getLastBlock, sendBlockToServer, sendChainToServer, sendTransactionToServer ,getBlockById} from "./functions/src/blockchain-core/database_logic";
 import { Wallet } from "./functions/src/blockchain-core/wallet";
-
-
+import readline from 'readline';
 
 
 export const initializeGenesisBlock = async () => {
@@ -151,20 +150,18 @@ const main = async () => {
       console.error("Initialization error:", error);
     }
   };
-  
-  async function getUserInput(question:any) {
-    const readline = require('readline').createInterface({
+  async function getUserInput(question:string) {
+    const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
   
     return new Promise((resolve) => {
-      readline.question(question, (answer:any) => {
-        readline.close();
+      rl.question(question, (answer) => {
+        rl.close();
         resolve(answer);
       });
     });
   }
-  
   main();
   

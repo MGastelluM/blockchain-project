@@ -1,5 +1,3 @@
-require("esm-hook");
-const fetch = require("node-fetch").default;
 import { Transaction } from "./transaction";
 import { Block } from './block'; // Import the Block type
 
