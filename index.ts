@@ -32,8 +32,6 @@ export const setSecondaryBlockInitialize = async () => {
     const sender = new Wallet();
     const recipient = new Wallet();
     await sender.sendMoney(50, recipient .publicKey);
-    await sendTransactionToServer(Chain.instance.lastBlock.transaction);
-    await sendBlockToServer(Chain.instance.lastBlock);
     await sendChainToServer(Chain.instance.chain);
 }
 
@@ -48,9 +46,7 @@ export const sendGenericTransaction = async () => {
     // Send the random transaction
     await sender.sendMoney(amount, recipient.publicKey);
   
-    // Update the server with the latest transaction and block
-    await sendTransactionToServer(Chain.instance.lastBlock.transaction);
-    await sendBlockToServer(Chain.instance.lastBlock);
+
     await sendChainToServer(Chain.instance.chain);
   
     console.log("Generic transaction sent successfully!");
@@ -104,6 +100,7 @@ console.log(`Hash: ${block.hash}`);
 const main = async () => {
     try {
       await Chain.instance.initializeChain();
+      await sendChainToServer(Chain.instance.chain);
       console.log("Initialization complete");
   
       while (true) {

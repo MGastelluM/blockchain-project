@@ -1,5 +1,11 @@
-cre# <toBeDefinedCoin> BlockChain UDP proyect
-<nameYetToBeDefined-Coin> is based on a group proyect to create a real functional distributed blockchain with amazing improvements (to be determined) 
+# <CheloCoin> BlockChain UDP proyect
+[![Node Version 16.5.0](https://cdn.iconscout.com/icon/free/png-256/free-node-js-1-1174935.png)](https://nodejs.org/en/blog/release/v16.5.0)
+
+<CheloCoin> is based on a group proyect to create a real functional distributed blockchain with amazing improvements. 
+Basically it is a small-sized cryptocurrency that uses DB-Level as a DBB, typescript for the main code and front console.
+
+This starting proyect of a blockchain fetches via POST to the database, always refreshing the chain as a whole. 
+
 
 ## Installation
 
@@ -12,24 +18,41 @@ git clone https://github.com/MGastelluM/blockchain-project.git
 cd blockchain-project
 ```
 
-2. Install the dependencies:
-
-```bash
- npm install -D typescript @types/node
-```
-
-3. Initialize and start the database:
+2. Initialize and start the database:
 
 ```bash
     cd db-level
     npm install
     npm start
 ```
+3.  Initialize and start the Chain in a *NEW* terminal:
 
-4. Execute in root project directory:
 ```bash
-    npm start
+ cd blockchain-project
+ npm install -D typescript @types/node
+ npm start
 ```
+
+## Usage
+
+The main usage of the chain is based on a simple menu by console. Upon initialization the code creates a genesis block and updates the database, next if the genesis already exists on the database as a chain in the dataBase folder inside db-level, the chain will be retrieved from the DBB. 
+
+The first (1) option "prints" the last block from chain 
+The second (2) option "gets" and prints the last block from the database stored chain
+the other options works as intended, with a CRUD behavior.
+
+```bash
+ Menu:
+ 1. See last block from chain
+ 2. See last block from the database
+ 3. Get genesis block from database
+ 4. Send a generic transaction
+ 5. Get block by ID
+ 6. <test>
+ 7. Exit
+ Choose an option (1-5):
+```
+
 
 ## Firts approach to Blockchain
 
@@ -88,7 +111,18 @@ seba.sendMoney(50, chalo.publicKey);
 console.log(Chain.instance);
 console.log(Chain.instance.lastBlock.transaction);
 ```
+### Collaborators
 
+* [MGastelluM](https://github.com/MGastelluM) -
+  **Matías Gastellu** <<matias.gastellu@mail.udp.com>> 
+* [mxrchelo](https://github.com/mxrchelo) -
+  **Marcelo Quiñones** <<marcelo.quinones@mail.udp.com>> 
+* [Esgarothh](https://github.com/Esgarothh) -
+  **Sebastian Arroyo** <<sebastian.arroyo@mail.udp.com>> 
+* [Victor](https://github.com/Victorn) -
+  **Victor Fuentes** <<Victor.fuentes@mail.udp.cl>>
+
+  
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
