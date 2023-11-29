@@ -116,7 +116,7 @@ const main = async () => {
         console.log("6. <test> ");
         console.log("7. Exit");
   
-        const choice = await getUserInput("Choose an option (1-5): ");
+        const choice = await getUserInput("Choose an option (1-7): ");
   
         switch (choice) {
           case '1':
