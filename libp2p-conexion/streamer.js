@@ -22,7 +22,7 @@ import Jetty from "jetty";
 const jetty = new Jetty(process.stdout);
 // Configure test from here
 const time = 120; // Test time in seconds
-const show = true; // show messages in console or not
+const show = false; // show messages in console or not
 const throttle = 10; // How many ms it will wait between one message and another
 const protocol = "/echo/1.0.0"; // Protocol name
 const size = 2048; // Size of exchanged random buffer
@@ -36,10 +36,25 @@ let received = [];
 // Useful variables for testing
 let started = false;
 let starting = false;
-let resets = 0;
-let exchanged = 0;
-let successful = 0;
-let elapsed = 0;
+
+let handleMessageCallback;
+
+const MIN_NODES_REQUIRED = 1;
+let connectedNodes = 0;
+let onNodesConnectedCallback = null;
+let onNodeDisconnectedCallback = null;
+
+export function setHandleMessageCallback(callback) {
+	handleMessageCallback = callback;
+}
+
+export function setOnNodesConnectedCallback(callback) {
+	onNodesConnectedCallback = callback;
+}
+
+export function setOnNodeDisconnectedCallback(callback) {
+	onNodeDisconnectedCallback = callback;
+}
 
 function handleStream(stream) {
 	try {
@@ -64,7 +79,11 @@ function handleStream(stream) {
 						}
 						if (relayed.indexOf(msg.toString()) === -1) {
 							relayed.push(msg.toString());
+							if (handleMessageCallback) {
+								handleMessageCallback(msg.toString());
+							}
 							relayMessage(msg);
+							break;
 						}
 					}
 				}
@@ -102,7 +121,6 @@ async function relayMessage(message) {
 					console.log("[STREAM FAILED]", e.message);
 				}
 				await node.hangUp(multiaddr(active[k]));
-				resets++;
 				success = false;
 			}
 		}
@@ -165,7 +183,7 @@ function returnBootstrappers() {
 	}
 	return bootstrapers;
 }
-async function sendMessage(str) {
+export async function sendMessage(str) {
 	const bytes = _.random(size, size, 0);
 	const message =
 		"[" + new Date().getTime() + "] [" + process.argv[2] + "] " + str;
@@ -176,7 +194,7 @@ async function sendMessage(str) {
 		console.log(`Message sent successfully: ${message}`);
 	}
 }
-async function startNode() {
+export async function startNode() {
 	if (!starting && !started) {
 		starting = true;
 		// Creating node
@@ -221,9 +239,34 @@ async function startNode() {
 			node.connectionManager.addEventListener(
 				"peer:connect",
 				async (connection) => {
+					connectedNodes++;
+					if (
+						connectedNodes >= MIN_NODES_REQUIRED &&
+						onNodesConnectedCallback
+					) {
+						onNodesConnectedCallback();
+					}
 					if (show) {
 						console.log("--");
 						console.log("Connected to %s", connection.detail.remotePeer); // Log connected peer
+					}
+				}
+			);
+
+			node.connectionManager.addEventListener(
+				"peer:disconnect",
+				(connection) => {
+					connectedNodes--;
+					console.log(
+						"A node has been disconnected from %s",
+						connection.detail.remotePeer
+					);
+					if (
+						connectedNodes < MIN_NODES_REQUIRED &&
+						onNodeDisconnectedCallback
+					) {
+						console.log("NOT ENOUGH NODES - Waiting for connections...");
+						onNodeDisconnectedCallback();
 					}
 				}
 			);
@@ -243,15 +286,6 @@ async function startNode() {
 				maxOutboundStreams: 500000,
 			});
 
-			// Starting test stream
-			console.log("Starting test, results will show up in 5 seconds..");
-			//startStreaming();
-			setTimeout(function () {
-				setInterval(function () {
-					sendMessage("holaaa");
-				}, 5000);
-			}, 5000);
-
 			started = true;
 			starting = false;
 		} catch (e) {
@@ -261,37 +295,17 @@ async function startNode() {
 			console.log("--");
 		}
 	}
+	return new Promise((resolve) => {
+		setOnNodesConnectedCallback(() => {
+			console.log(
+				`Connected to ${MIN_NODES_REQUIRED} nodes. Starting the menu.`
+			);
+			resolve();
+		});
+	});
 }
-
+/*
 setTimeout(function () {
 	startNode();
 }, Math.floor(Math.random() * 1000));
-
-// Print progresses
-/**
-setTimeout(function () {
-	setInterval(function () {
-		jetty.clear();
-		console.log(
-			"Testing libp2p for " + time + " seconds, elapsed " + elapsed,
-			"s."
-		);
-		console.log("Using " + (bootstrapers.length + 1) + " nodes.");
-		console.log("Exchange packages of " + size + " bytes.");
-		console.log("Throttle between messages is:", throttle + "ms.");
-		console.log("--");
-		console.log("Exchanged bytes:", exchanged);
-		console.log("Successful relays:", successful);
-		console.log("Connection resets:", resets);
-		console.log("Messages received:", received.length);
-		console.log("Messages relayed:", relayed.length);
-		console.log("Rate KB/s:", (exchanged / elapsed / 1000).toFixed(2));
-	}, 500);
-}, 5000);
- */
-setInterval(function () {
-	elapsed++;
-}, 1000);
-setTimeout(function () {
-	process.exit();
-}, (time + 1) * 1000);
+*/

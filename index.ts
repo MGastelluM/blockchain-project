@@ -3,9 +3,11 @@ import { Chain } from "./functions/src/blockchain-core/chain";
 import { getGenesisBlock, getLastBlock, sendBlockToServer, sendChainToServer, sendTransactionToServer ,getBlockById} from "./functions/src/blockchain-core/database_logic";
 import { Wallet } from "./functions/src/blockchain-core/wallet";
 import * as readline from 'readline';
-import { startNode,sendMessage, sendMessageToPeers ,setHandleMessageCallback} from './libp2p-conexion/streamer';
+import { startNode,sendMessage, sendMessageToPeers ,setHandleMessageCallback, setOnNodeDisconnectedCallback} from './libp2p-conexion/streamer';
 
 
+
+const wallets = []
 
 export const initializeGenesisBlock = async () => {
     console.log("Initializing genesis block OR retrieve of the last block from chaindb");
@@ -114,6 +116,9 @@ setHandleMessageCallback((message) => {
   renderMenu();
 });
 
+setOnNodeDisconnectedCallback(() => {
+  console.log("A node has disconnected. Disabling the menu.");
+});
 const renderMenu = () => {
   // Clear the terminal screen
 
@@ -125,7 +130,6 @@ const renderMenu = () => {
   console.log("5. Get block by ID");
   console.log("6. <test> ");
   console.log("7. Exit");
-  console.log("Choose an option (1-5): ");
   // Display received messages
   
 
@@ -137,6 +141,7 @@ const main = async () => {
       await sendChainToServer(Chain.instance.chain);
       console.log("Initialization complete");
       const response = await startNode()
+      
       console.clear();
       renderMenu();
       while (true) {
