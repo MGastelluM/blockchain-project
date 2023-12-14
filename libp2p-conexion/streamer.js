@@ -17,9 +17,9 @@ import { pipe } from "it-pipe";
 import fs from "fs";
 import _ from "lodash";
 import crypto from "crypto";
-import Jetty from "jetty";
+import { Wallet } from "../functions/src/blockchain-core/wallet.js";
+import { getWalletById, sendWalletDataToServer} from  "../functions/src/blockchain-core/database_logic.js";
 
-const jetty = new Jetty(process.stdout);
 // Configure test from here
 const time = 120; // Test time in seconds
 const show = false; // show messages in console or not
@@ -89,7 +89,13 @@ function handleStream(stream) {
 	}
 }
 
-export async function sendTransaction(destinyNode, amount, initialValue) {
+export async function sendTransaction(destinyNode, amount) {
+	const wallet = await getWalletById(`${destinyNode}`);
+	if (wallet === null) {
+		console.log('Wallet not found');
+		return;
+	}
+	const initialValue = wallet.balance;
 	const transactionMessage = `[Transaction] To: ${destinyNode}, Amount: ${amount}, Initial Value: ${initialValue}`;
 	const response = await relayMessage(transactionMessage);
 	if (response) {
@@ -233,6 +239,18 @@ export async function startNode() {
 				exportToProtobuf(peerId).toString("hex")
 			);
 		}
+
+		//create wallet for the node if its not exist in database
+		let walletIdInDatabase = await getWalletById(peerId);
+		if(walletIdInDatabase === null) {
+			console.log('walletIdInDatabase:', walletIdInDatabase);
+			const nodeWallet = new Wallet()
+			walletIdInDatabase = peerId;
+			await sendWalletDataToServer(walletIdInDatabase, { publicKey: nodeWallet.publicKey, privateKey: nodeWallet.privateKey, balance: nodeWallet.balance});
+			const walletId = await getWalletById(walletIdInDatabase);
+			console.log('walletId:', walletId);
+		}
+
 		try {
 			const port = "700" + parseInt(process.argv[2]);
 			node = await createLibp2p({

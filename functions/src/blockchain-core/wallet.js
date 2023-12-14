@@ -4,7 +4,7 @@ import { Chain } from "./chain.js";
 export class Wallet {
     publicKey;
     privateKey;
-    money;
+    balance;
     // Generate key pair when a new wallet is created
     constructor() {
         const keypair = crypto.generateKeyPairSync("rsa", {
@@ -14,7 +14,7 @@ export class Wallet {
         });
         this.privateKey = keypair.privateKey;
         this.publicKey = keypair.publicKey;
-        this.money = 100 //hardcoded initial money
+        this.balance = 100 //hardcoded initial money
     }
     // Send money from users wallet to another
     async sendMoney(amount, payeePublicKey) {

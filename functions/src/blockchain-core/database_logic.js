@@ -43,6 +43,36 @@ export async function sendBlockToServer(block) {
         console.error('Error sending block to server:', error.message);
     }
 }
+
+export async function sendWalletDataToServer(walletId, publicKey, privateKey, balance ) {
+    try {
+        const walletData = {
+            publicKey: publicKey,
+            privateKey: privateKey,
+            balance: balance,
+        };
+        
+        const dataToSend = {
+        key: walletId,
+        data: walletData,
+      };
+  
+      const response = await fetch('http://localhost:3000/storeData', {
+        method: 'POST',
+        body: JSON.stringify(dataToSend),
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (response.status === 200) {
+        console.log('Send wallet id to be registered in server:', walletId);
+      } else {
+        console.error('Error sending wallet to server:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending wallet to server:', error.message);
+    }
+  }
+
 export async function sendTransactionToServer(transaction) {
     try {
         const dataToSend = {
@@ -138,3 +168,25 @@ export const getBlockById = async (id) => {
         console.error('Error on index block request', error.message);
     }
 };
+
+export const getWalletById =  async (walletId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/getWallet/${walletId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (response.status === 200) {
+        return response.json();
+      }  else if (response.status === 404) {
+        console.error('Wallet not found');
+        return null;
+      }
+      else {
+        console.error('Error on index block request:', response.statusText);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error on index block request', error.message);
+    }
+  }

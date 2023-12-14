@@ -87,6 +87,23 @@ app.get("/getBlockById/:blockId", async (req, res) => {
 	}
 });
 
+app.get("/getWallet/:walletId", async (req, res) => {
+	try {
+		const walletHash = req.params.walletId;
+
+		// Retrieve the block with the specified hash from the database
+		const wallet = await db.get(walletHash);
+		//const walletHashBlock = Object.values(blocks).find((block) => block.hash === blockHash);
+		console.log("wallet fetched successfully", wallet);
+		//console.log("wallet fetched successfully", wallet);
+
+		res.status(200).json(wallet);
+	} catch (error) {
+		console.error("Error retrieving wallet:", error);
+		res.status(500).json({ error: "Error retrieving wallet" });
+	}
+})
+
 const port = 3000;
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
