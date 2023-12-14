@@ -8,3 +8,17 @@ typings/
 # Node.js dependency directory
 node_modules/
 lib/
+db-level/dataBase/000003.log
+db-level/dataBase/000005.ldb
+db-level/dataBase/000006.log
+db-level/dataBase/CURRENT
+db-level/dataBase/LOG
+db-level/dataBase/LOG.old
+db-level/dataBase/MANIFEST-000002
+db-level/dataBase/MANIFEST-000004
+package-lock.json
+index.js
+db-level/dataBase/000003.log
+db-level/dataBase/CURRENT
+db-level/dataBase/LOG
+db-level/dataBase/MANIFEST-000002
