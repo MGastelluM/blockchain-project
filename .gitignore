@@ -22,6 +22,7 @@ db-level/dataBase/000003.log
 db-level/dataBase/CURRENT
 db-level/dataBase/LOG
 db-level/dataBase/MANIFEST-000002
+<<<<<<< HEAD
 libp2p-conexion/nodes/1
 libp2p-conexion/nodes/1_id
 libp2p-conexion/nodes/2
@@ -29,3 +30,5 @@ libp2p-conexion/nodes/2_id
 libp2p-conexion/nodes/3
 libp2p-conexion/nodes/3_id
 db-level/dataBase/LOG
+=======
+>>>>>>> origin/main

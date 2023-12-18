@@ -5,9 +5,13 @@
   "exports": "./start.js",
   "type": "module",
   "scripts": {
+<<<<<<< HEAD
     "start": "node index.js",
     "startDocker" : "npx ts-node ./index.ts",
      "build": "tsc",
+=======
+    "start": "ts-node index.ts",
+>>>>>>> origin/main
     "p2p": "node libptest.js",
     "p2phttp": "node simpleMainNodelibp2p.js",
     "p2phttp2": "node l2.js",
