@@ -123,7 +123,7 @@ const renderWallet = (thisWallet) => {
     // Clear the terminal screen (if needed)
     console.log("Welcome!")
     console.log("\nWallet Information:");
-    console.log("Current Money: ", thisWallet.money);
+    console.log("Current Money: ", thisWallet.balance);
 };
 
 const renderMenu = () => {
@@ -187,8 +187,8 @@ const main = async () => {
                     console.log('Message sent.');
                     break;
                 case '7':
-                    const currentnodes = getCurrentNodes()
-                    console.log("Choose a node number:" + currentnodes)
+                    const currentnodes = await getCurrentNodes()
+                    console.log("Choose a node number:" + JSON.stringify(currentnodes))
                     const userNodeInput = await getUserInput("Enter the node ID: ");
                     const userMoneyToSend = await getUserInput("Enter amount of money:")
                     const sended = await sendTransaction(userNodeInput, userMoneyToSend)
