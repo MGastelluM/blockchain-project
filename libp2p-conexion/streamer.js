@@ -59,26 +59,21 @@ export function setOnNodeDisconnectedCallback(callback) {
 function handleStream(stream) {
 	try {
 		pipe(
-			// Read from the stream (the source)
 			stream.source,
-			// Decode length-prefixed data
 			lp.decode(),
-			// Turn buffers into strings
 			(source) => map(source, (buf) => uint8ArrayToString(buf.subarray())),
-			// Sink function
 			async function (source) {
-				// For each chunk of data
 				for await (const msg of source) {
-					// Output the data as a utf8 string
 					if (received.indexOf(msg.toString()) === -1) {
 						received.push(msg.toString());
 						if (show) {
-							console.log(
-								"> " + msg.toString().replace("\n", "") + " > from:" + source
-							);
+							console.log(`> ${msg.toString().replace("\n", "")} > from: ${source}`);
 						}
 						if (relayed.indexOf(msg.toString()) === -1) {
 							relayed.push(msg.toString());
+							if (handleTransaction(msg.toString())) {
+								break;
+							}
 							if (handleMessageCallback) {
 								handleMessageCallback(msg.toString());
 							}
@@ -92,6 +87,33 @@ function handleStream(stream) {
 	} catch (e) {
 		console.log(e.message);
 	}
+}
+
+export async function sendTransaction(destinyNode, amount, initialValue) {
+	const transactionMessage = `[Transaction] To: ${destinyNode}, Amount: ${amount}, Initial Value: ${initialValue}`;
+	const response = await relayMessage(transactionMessage);
+	if (response) {
+		console.log(`Transaction sent successfully: ${transactionMessage}`);
+	}
+}
+
+function handleTransaction(message) {
+	const isTransaction = message.includes("[Transaction]");
+	if (isTransaction) {
+		// Extract relevant information from the transaction message
+		const [, destinyNode, amount, initialValue] = /To: (\d+), Amount: (\d+), Initial Value: (.+)/.exec(message) || [];
+
+		// Process the transaction as needed
+		console.log("Received Transaction:");
+		console.log("Destiny Node:", destinyNode);
+		console.log("Amount:", amount);
+		console.log("Initial Value:", initialValue);
+
+		// Your custom logic for handling transactions goes here
+
+		return true; // Return true to indicate the message was a transaction
+	}
+	return false; // Return false to indicate the message was not a transaction
 }
 
 async function relayMessage(message) {
@@ -303,6 +325,15 @@ export async function startNode() {
 			resolve();
 		});
 	});
+
+}
+
+export async function getCurrentNodes() {
+	if (started) {
+		return bootstrapers;
+	} else {
+		throw new Error("Node is not started yet");
+	}
 }
 /*
 setTimeout(function () {
