@@ -24,4 +24,12 @@ export class Wallet {
         const signature = sign.sign(this.privateKey);
         await Chain.instance.addBlock(transaction, this.publicKey, signature);
     }
+
+    receiveMoney(amount) {
+        return new Promise((resolve, reject) => {
+            this.balance = parseInt(this.balance) + parseInt(amount);
+            console.log("Works!");
+            resolve(); // Resolve the promise to indicate success
+        });
+    }
 }
