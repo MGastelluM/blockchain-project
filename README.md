@@ -89,27 +89,7 @@ First, we import `crypto` module to get hash a value in order to get the connect
 To get a block we consider a `transaction` object, a `nonce` used in mining process, and `prevhash`, to get the connection between a block and its previous block. Also, we need a `index` value and `timestamp`.
 
 
-## Usage Example: Sending a Transaction with a Wallet
 
-In this example, we'll demonstrate how to create a wallet, send a transaction, and interact with a blockchain using the `Wallet` and `Chain` classes.
-
-### Step 1: Create a Wallet
-
-First, create a wallet instance. A wallet represents an entity capable of sending and receiving transactions on the blockchain.
-
-```javascript
-import { Wallet } from "./functions/src/blockchain-core/wallet";
-import { Chain } from "./functions/src/blockchain-core/chain";
-
-const primaryBlock = Chain.instance.lastBlock; //GENESIS
-
-const seba = new Wallet();
-const chalo = new Wallet();
-
-seba.sendMoney(50, chalo.publicKey);
-
-console.log(Chain.instance);
-console.log(Chain.instance.lastBlock.transaction);
 ```
 ### Collaborators
 
