@@ -25,12 +25,17 @@ cd blockchain-project
     npm install
     npm start
 ```
-3.  Initialize and start the Chain in a *NEW* terminal:
+3.  Initialize and start the Chain and create a node 1 in a *NEW* terminal:
 
 ```bash
  cd blockchain-project
- npm install -D typescript @types/node
- npm start
+ npm start 1
+```
+4.  Create a node 2 in a *NEW* terminal:
+
+```bash
+ cd blockchain-project
+ npm start 2
 ```
 
 ## Usage
