@@ -25,12 +25,19 @@ cd blockchain-project
     npm install
     npm start
 ```
-3.  Initialize and start the Chain in a *NEW* terminal:
+3.  Initialize and start the Chain and create a node 1 in a *NEW* terminal:
 
 ```bash
  cd blockchain-project
- npm install -D typescript @types/node
- npm start
+ npm install
+ npm start 1
+```
+4.  Create a node 2 in a *NEW* terminal:
+
+```bash
+ cd blockchain-project
+ npm install
+ npm start 2
 ```
 
 ## Usage
@@ -40,6 +47,8 @@ The main usage of the chain is based on a simple menu by console. Upon initializ
 The first (1) option "prints" the last block from chain 
 The second (2) option "gets" and prints the last block from the database stored chain
 the other options works as intended, with a CRUD behavior.
+The last two added features have implemented (6-7) to test p2p protocol using libp2p module. Option 6 broadcast a message to the whole network and option 7 send a transaction to another node. Option 8 updates the wallet state.
+
 
 ```bash
  Menu:
@@ -48,9 +57,11 @@ the other options works as intended, with a CRUD behavior.
  3. Get genesis block from database
  4. Send a generic transaction
  5. Get block by ID
- 6. <test>
- 7. Exit
- Choose an option (1-5):
+ 6. Broadcast a message
+ 7. Send a transaction to another node by ID:
+ 8. REFRESH F5 (be understanding is terminal based)):
+ 9. Exit
+ Choose an option (1-8):
 ```
 
 
@@ -89,28 +100,10 @@ First, we import `crypto` module to get hash a value in order to get the connect
 To get a block we consider a `transaction` object, a `nonce` used in mining process, and `prevhash`, to get the connection between a block and its previous block. Also, we need a `index` value and `timestamp`.
 
 
-## Usage Example: Sending a Transaction with a Wallet
+## White Paper
+The white paper has been added in the root folder.
 
-In this example, we'll demonstrate how to create a wallet, send a transaction, and interact with a blockchain using the `Wallet` and `Chain` classes.
 
-### Step 1: Create a Wallet
-
-First, create a wallet instance. A wallet represents an entity capable of sending and receiving transactions on the blockchain.
-
-```javascript
-import { Wallet } from "./functions/src/blockchain-core/wallet";
-import { Chain } from "./functions/src/blockchain-core/chain";
-
-const primaryBlock = Chain.instance.lastBlock; //GENESIS
-
-const seba = new Wallet();
-const chalo = new Wallet();
-
-seba.sendMoney(50, chalo.publicKey);
-
-console.log(Chain.instance);
-console.log(Chain.instance.lastBlock.transaction);
-```
 ### Collaborators
 
 * [MGastelluM](https://github.com/MGastelluM) -
