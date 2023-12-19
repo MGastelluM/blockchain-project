@@ -47,7 +47,8 @@ The main usage of the chain is based on a simple menu by console. Upon initializ
 The first (1) option "prints" the last block from chain 
 The second (2) option "gets" and prints the last block from the database stored chain
 the other options works as intended, with a CRUD behavior.
-The last two added features have implemented (6-7) to test p2p protocol using libp2p module. Option 6 broadcast a message to the whole network and option 7 send a transaction to another node.
+The last two added features have implemented (6-7) to test p2p protocol using libp2p module. Option 6 broadcast a message to the whole network and option 7 send a transaction to another node. Option 8 updates the wallet state.
+
 
 ```bash
  Menu:
@@ -58,7 +59,8 @@ The last two added features have implemented (6-7) to test p2p protocol using li
  5. Get block by ID
  6. Broadcast a message
  7. Send a transaction to another node by ID:
- 8. Exit
+ 8. REFRESH F5 (be understanding is terminal based)):
+ 9. Exit
  Choose an option (1-8):
 ```
 
