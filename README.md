@@ -100,6 +100,8 @@ To get a block we consider a `transaction` object, a `nonce` used in mining proc
 
 ## Libp2p setup
 
+
+```
 ### Collaborators
 
 * [MGastelluM](https://github.com/MGastelluM) -
