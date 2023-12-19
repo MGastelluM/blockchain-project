@@ -48,9 +48,10 @@ the other options works as intended, with a CRUD behavior.
  3. Get genesis block from database
  4. Send a generic transaction
  5. Get block by ID
- 6. <test>
- 7. Exit
- Choose an option (1-5):
+ 6. Enviar mensaje a otros nodos (por defecto broadcast)
+ 7. Enviar transacción a otro nodo(por defecto unico otro nodo o broacast):
+ 8. Exit
+ Choose an option (1-8):
 ```
 
 
