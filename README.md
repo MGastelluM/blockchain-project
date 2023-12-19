@@ -47,6 +47,7 @@ The main usage of the chain is based on a simple menu by console. Upon initializ
 The first (1) option "prints" the last block from chain 
 The second (2) option "gets" and prints the last block from the database stored chain
 the other options works as intended, with a CRUD behavior.
+The last two added features have implemented (6-7) to test p2p protocol using libp2p module. Option 6 broadcast a message to the whole network and option 7 send a transaction to another node.
 
 ```bash
  Menu:
@@ -55,8 +56,8 @@ the other options works as intended, with a CRUD behavior.
  3. Get genesis block from database
  4. Send a generic transaction
  5. Get block by ID
- 6. Enviar mensaje a otros nodos (por defecto broadcast)
- 7. Enviar transacción a otro nodo(por defecto unico otro nodo o broacast):
+ 6. Broadcast a message
+ 7. Send a transaction to a node by ID:
  8. Exit
  Choose an option (1-8):
 ```
