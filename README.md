@@ -57,7 +57,7 @@ The last two added features have implemented (6-7) to test p2p protocol using li
  4. Send a generic transaction
  5. Get block by ID
  6. Broadcast a message
- 7. Send a transaction to a node by ID:
+ 7. Send a transaction to another node by ID:
  8. Exit
  Choose an option (1-8):
 ```
@@ -98,8 +98,8 @@ First, we import `crypto` module to get hash a value in order to get the connect
 To get a block we consider a `transaction` object, a `nonce` used in mining process, and `prevhash`, to get the connection between a block and its previous block. Also, we need a `index` value and `timestamp`.
 
 
+## Libp2p setup
 
-```
 ### Collaborators
 
 * [MGastelluM](https://github.com/MGastelluM) -
