@@ -29,12 +29,14 @@ cd blockchain-project
 
 ```bash
  cd blockchain-project
+ npm install
  npm start 1
 ```
 4.  Create a node 2 in a *NEW* terminal:
 
 ```bash
  cd blockchain-project
+ npm install
  npm start 2
 ```
 
