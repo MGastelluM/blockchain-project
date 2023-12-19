@@ -122,11 +122,9 @@ setOnNodeDisconnectedCallback(() => {
     console.log("A node has disconnected. Disabling the menu.");
 });
 
-setOnNodeChargingCallback((message) => {
+setOnNodeChargingCallback(async (message) => {
     console.log("Received transaction:");
-    console.log("the previous valance of this wallet was=", thisWallet.balance)
-    thisWallet.receiveMoney(message)
-    console.log("the new balance of this wallet is =", thisWallet.balance)
+    await thisWallet.receiveMoney(message)
     renderWallet(thisWallet)
     renderMenu();
 });

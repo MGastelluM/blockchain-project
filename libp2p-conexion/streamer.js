@@ -63,7 +63,6 @@ export function setOnNodeDisconnectedCallback(callback) {
 let handleChargingCallback;
 export function setOnNodeChargingCallback(callback) {
 	handleChargingCallback = callback;
-	console.log("Callback set:", callback);
 }
 
 function handleStream(stream) {
@@ -81,20 +80,17 @@ function handleStream(stream) {
 						}
 						if (relayed.indexOf(msg.toString()) === -1) {
 							relayed.push(msg.toString());
-							if (handleChargingCallback) {
+							if (handleChargingCallback && msg.includes("[Transaction]")) {
 								const amount = await handleTransaction(msg.toString())
 								handleChargingCallback(amount.toString())
-								console.log("was a transaction")
 								break;
 							}
 							if (msg.includes('[WalletInfoRequesting]')) {
-								console.log("was a wallet request")
 								const info = await
 									sendMessage('[WalletInfoRequested],')
 								break;
 							}
 							if (handleMessageCallback) {
-								console.log("was a message")
 								handleMessageCallback(msg.toString());
 							}
 							await relayMessage(msg);
@@ -112,7 +108,6 @@ function handleStream(stream) {
 
 async function handleTransaction(message) {
 	const isTransaction = message.includes("[Transaction]");
-	console.log("the message was==" + message + " and transacion is true=" + message.includes("[Transaction]"))
 	if (!isTransaction) { return false }
 	if (isTransaction) {
 		// Extract relevant information from the transaction message
@@ -354,7 +349,6 @@ export async function startNode() {
 					}
 				}
 			);
-			// print out listening addresses
 			console.log("listening on addresses:");
 			fs.writeFileSync("nodes/" + process.argv[2], "");
 			let addresslist = "";
@@ -364,7 +358,6 @@ export async function startNode() {
 				fs.writeFileSync("nodes/" + process.argv[2], addresslist);
 			});
 
-			// Handle incoming stream
 			await node.handle(protocol, async ({ stream }) => handleStream(stream), {
 				maxInboundStreams: 500000,
 				maxOutboundStreams: 500000,
