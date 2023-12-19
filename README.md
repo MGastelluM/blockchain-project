@@ -100,8 +100,8 @@ First, we import `crypto` module to get hash a value in order to get the connect
 To get a block we consider a `transaction` object, a `nonce` used in mining process, and `prevhash`, to get the connection between a block and its previous block. Also, we need a `index` value and `timestamp`.
 
 
-## Libp2p setup
-
+## White Paper
+The white paper has been added in the root folder.
 
 
 ### Collaborators
