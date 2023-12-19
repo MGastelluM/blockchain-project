@@ -25,7 +25,7 @@ export class Wallet {
         await Chain.instance.addBlock(transaction, this.publicKey, signature);
     }
 
-    receiveMoney(amount) {
+    async receiveMoney(amount) {
         return new Promise((resolve, reject) => {
             this.balance = parseInt(this.balance) + parseInt(amount);
             console.log("Works!");

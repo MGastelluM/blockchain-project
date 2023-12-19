@@ -97,7 +97,7 @@ function handleStream(stream) {
 								console.log("was a message")
 								handleMessageCallback(msg.toString());
 							}
-							relayMessage(msg);
+							await relayMessage(msg);
 							break;
 						}
 					}
