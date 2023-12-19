@@ -5,7 +5,6 @@ export class Wallet {
     publicKey;
     privateKey;
     balance;
-    // Generate key pair when a new wallet is created
     constructor() {
         const keypair = crypto.generateKeyPairSync("rsa", {
             modulusLength: 2048,
@@ -16,12 +15,18 @@ export class Wallet {
         this.publicKey = keypair.publicKey;
         this.balance = 100 //hardcoded initial money
     }
-    // Send money from users wallet to another
     async sendMoney(amount, payeePublicKey) {
         const transaction = new Transaction(amount, this.publicKey, payeePublicKey);
         const sign = crypto.createSign("SHA256");
         sign.update(transaction.toString()).end();
         const signature = sign.sign(this.privateKey);
         await Chain.instance.addBlock(transaction, this.publicKey, signature);
+    }
+
+    async receiveMoney(amount) {
+        return new Promise((resolve, reject) => {
+            this.balance = parseInt(this.balance) + parseInt(amount);
+            resolve();
+        });
     }
 }

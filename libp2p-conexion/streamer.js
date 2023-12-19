@@ -18,7 +18,7 @@ import fs from "fs";
 import _ from "lodash";
 import crypto from "crypto";
 import { Wallet } from "../functions/src/blockchain-core/wallet.js";
-import { getWalletById, sendWalletDataToServer} from  "../functions/src/blockchain-core/database_logic.js";
+import { getWalletById, sendWalletDataToServer } from "../functions/src/blockchain-core/database_logic.js";
 
 // Configure test from here
 const time = 120; // Test time in seconds
@@ -44,6 +44,7 @@ let connectedNodes = 0;
 let onNodesConnectedCallback = null;
 let onNodeDisconnectedCallback = null;
 
+
 export function setHandleMessageCallback(callback) {
 	handleMessageCallback = callback;
 }
@@ -52,8 +53,16 @@ export function setOnNodesConnectedCallback(callback) {
 	onNodesConnectedCallback = callback;
 }
 
+export function setOnNodeConnectedCallback(callback) {
+	onNodesConnectedCallback = callback;
+}
+
 export function setOnNodeDisconnectedCallback(callback) {
 	onNodeDisconnectedCallback = callback;
+}
+let handleChargingCallback;
+export function setOnNodeChargingCallback(callback) {
+	handleChargingCallback = callback;
 }
 
 function handleStream(stream) {
@@ -71,13 +80,20 @@ function handleStream(stream) {
 						}
 						if (relayed.indexOf(msg.toString()) === -1) {
 							relayed.push(msg.toString());
-							if (handleTransaction(msg.toString())) {
+							if (handleChargingCallback && msg.includes("[Transaction]")) {
+								const amount = await handleTransaction(msg.toString())
+								handleChargingCallback(amount.toString())
+								break;
+							}
+							if (msg.includes('[WalletInfoRequesting]')) {
+								const info = await
+									sendMessage('[WalletInfoRequested],')
 								break;
 							}
 							if (handleMessageCallback) {
 								handleMessageCallback(msg.toString());
 							}
-							relayMessage(msg);
+							await relayMessage(msg);
 							break;
 						}
 					}
@@ -89,38 +105,50 @@ function handleStream(stream) {
 	}
 }
 
-export async function sendTransaction(destinyNode, amount) {
-	const wallet = await getWalletById(`${destinyNode}`);
-	if (wallet === null) {
-		console.log('Wallet not found');
-		return;
-	}
-	const initialValue = wallet.balance;
-	const transactionMessage = `[Transaction] To: ${destinyNode}, Amount: ${amount}, Initial Value: ${initialValue}`;
-	const response = await relayMessage(transactionMessage);
-	if (response) {
-		console.log(`Transaction sent successfully: ${transactionMessage}`);
-	}
-}
 
-function handleTransaction(message) {
+async function handleTransaction(message) {
 	const isTransaction = message.includes("[Transaction]");
+	if (!isTransaction) { return false }
 	if (isTransaction) {
 		// Extract relevant information from the transaction message
-		const [, destinyNode, amount, initialValue] = /To: (\d+), Amount: (\d+), Initial Value: (.+)/.exec(message) || [];
+		const [, destinyNode, amount] = /To: (.+), Amount: (.+)/.exec(message) || [];
 
 		// Process the transaction as needed
 		console.log("Received Transaction:");
 		console.log("Destiny Node:", destinyNode);
 		console.log("Amount:", amount);
-		console.log("Initial Value:", initialValue);
 
-		// Your custom logic for handling transactions goes here
-
-		return true; // Return true to indicate the message was a transaction
+		return (amount)
 	}
-	return false; // Return false to indicate the message was not a transaction
 }
+
+
+export async function sendTransaction(destinyNode, amount) {
+	/*const wallet = await getWalletById(`${destinyNode}`);
+	if (!wallet) {
+		console.log('Wallet not found');
+		return false;
+	}
+	const initialValue = wallet.balance;*/
+	const transactionMessage = `[Transaction] To: ${destinyNode}, Amount: ${amount}`;
+	const response = await sendMessage(transactionMessage);
+	if (response) {
+		console.log(`Transaction sent successfully: ${transactionMessage}`);
+	}
+	return true
+}
+
+export async function askPeerWalletInfo(peerId) {
+	try {
+		//const stream = await dialPeer(peerId); // Implement dialPeer function accordingly
+		const walletInfoRequestMsg = '[WalletInfoRequest]'; // This is the message to request wallet information
+		const responde = await sendMessage(walletInfoRequestMsg)
+		//await stream.write(uint8ArrayFromString(walletInfoRequestMsg));
+	} catch (error) {
+		console.error(`Failed to ask for wallet info from peer ${peerId}: ${error.message}`);
+	}
+}
+
 
 async function relayMessage(message) {
 	return new Promise(async (response) => {
@@ -188,6 +216,16 @@ function startStreaming() {
 	});
 }
 
+function extractTransactionDetails(transactionMsg) {
+	const match = transactionMsg.match(/\[Transaction\] To: (.+), Amount: (.+), Initial Value: (.+)/);
+	if (match) {
+		const [, destinyNode, amount, initialValue] = match;
+		return { destinyNode, amount, initialValue };
+	}
+	return { destinyNode: null, amount: null, initialValue: null };
+}
+
+
 function returnBootstrappers() {
 	const bootstrapers = [];
 	const nodes = fs.readdirSync("./nodes");
@@ -242,11 +280,11 @@ export async function startNode() {
 
 		//create wallet for the node if its not exist in database
 		let walletIdInDatabase = await getWalletById(peerId);
-		if(walletIdInDatabase === null) {
+		if (walletIdInDatabase === null) {
 			console.log('walletIdInDatabase:', walletIdInDatabase);
 			const nodeWallet = new Wallet()
 			walletIdInDatabase = peerId;
-			await sendWalletDataToServer(walletIdInDatabase, { publicKey: nodeWallet.publicKey, privateKey: nodeWallet.privateKey, balance: nodeWallet.balance});
+			await sendWalletDataToServer(walletIdInDatabase, { publicKey: nodeWallet.publicKey, privateKey: nodeWallet.privateKey, balance: nodeWallet.balance });
 			const walletId = await getWalletById(walletIdInDatabase);
 			console.log('walletId:', walletId);
 		}
@@ -285,6 +323,7 @@ export async function startNode() {
 						onNodesConnectedCallback
 					) {
 						onNodesConnectedCallback();
+						onNodesConnectedCallback(connection.detail.remotePeer)
 					}
 					if (show) {
 						console.log("--");
@@ -310,7 +349,6 @@ export async function startNode() {
 					}
 				}
 			);
-			// print out listening addresses
 			console.log("listening on addresses:");
 			fs.writeFileSync("nodes/" + process.argv[2], "");
 			let addresslist = "";
@@ -320,7 +358,6 @@ export async function startNode() {
 				fs.writeFileSync("nodes/" + process.argv[2], addresslist);
 			});
 
-			// Handle incoming stream
 			await node.handle(protocol, async ({ stream }) => handleStream(stream), {
 				maxInboundStreams: 500000,
 				maxOutboundStreams: 500000,

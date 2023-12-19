@@ -2,11 +2,14 @@ import { Chain } from "./functions/src/blockchain-core/chain.js";
 import { getGenesisBlock, getLastBlock, sendBlockToServer, sendChainToServer, sendTransactionToServer, getBlockById } from "./functions/src/blockchain-core/database_logic.js";
 import { Wallet } from "./functions/src/blockchain-core/wallet.js";
 import * as readline from 'readline';
-import { startNode, sendMessage, sendTransaction, setHandleMessageCallback, setOnNodeDisconnectedCallback, getCurrentNodes } from './libp2p-conexion/streamer.js';
+import { startNode, askPeerWalletInfo, setOnNodeChargingCallback, sendMessage, sendTransaction, setHandleMessageCallback, setOnNodeConnectedCallback, setOnNodeDisconnectedCallback, getCurrentNodes } from './libp2p-conexion/streamer.js';
+import { Peer } from "./libp2p-conexion/peer.js";
 
 
+let thisWallet = new Wallet()
 
-const thisWallet = new Wallet()
+let peers = []
+
 
 export const initializeGenesisBlock = async () => {
     console.log("Initializing genesis block OR retrieve of the last block from chaindb");
@@ -119,6 +122,29 @@ setOnNodeDisconnectedCallback(() => {
     console.log("A node has disconnected. Disabling the menu.");
 });
 
+setOnNodeChargingCallback(async (message) => {
+    console.log("Received transaction:");
+    await thisWallet.receiveMoney(message)
+    renderWallet(thisWallet)
+    renderMenu();
+});
+
+setOnNodeConnectedCallback((peerId) => {
+    console.log("A node has Connected. .");
+
+    if (peerId in peers.peerId) {
+        return true
+    }
+    else {
+        //const inc = await askPeerWalletInfo(peerId);
+        const inc = { peerId: peerId, balance: 100, publicKey: thisWallet.publicKey }
+        const newPeer = new Peer(inc.peerId, inc.balance, inc.publicKey)
+        peers.push(newPeer)
+        console.log("new peer added to known peers:" + newPeer.peerId)
+    }
+
+});
+
 const renderWallet = (thisWallet) => {
     // Clear the terminal screen (if needed)
     console.log("Welcome!")
@@ -137,7 +163,9 @@ const renderMenu = () => {
     console.log("5. Get block by ID");
     console.log("6. Enviar mensaje a otros nodos (por defecto broadcast)");
     console.log("7. Enviar transacción a otro nodo(por defecto unico otro nodo o broacast):");
-    console.log("8. Exit");
+
+    console.log("8. REFRESH F5 (be understanding is terminal based)):");
+    console.log("9. Exit");
     // Display received messages
 
 
@@ -156,7 +184,7 @@ const main = async () => {
 
             renderWallet(thisWallet)
             renderMenu();
-            const choice = await getUserInput("Choose an option (1-8): ");
+            const choice = await getUserInput("Choose an option (1-9): ");
 
             switch (choice) {
                 case '1':
@@ -189,13 +217,16 @@ const main = async () => {
                 case '7':
                     const currentnodes = await getCurrentNodes()
                     console.log("Choose a node number:" + JSON.stringify(currentnodes))
-                    const userNodeInput = await getUserInput("Enter the node ID: ");
+                    const userNodeInput = await getUserInput("Enter the node ID(thiscase_use \"1 or 2\"): ");
                     const userMoneyToSend = await getUserInput("Enter amount of money:")
                     const sended = await sendTransaction(userNodeInput, userMoneyToSend)
                     if (sended) {
                         console.log("Successfull Transacction")
                     }
+                    break;
                 case '8':
+                    break;
+                case '9':
                     console.log("Exiting the menu.");
                     process.exit(0);
                 default:
